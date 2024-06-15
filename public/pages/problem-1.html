@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Design for Questions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-container {
+            margin-bottom: 40px;
+        }
+        .form-container h2 {
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Question 1: Add Without Carrying</h2>
+    <form id="form1" method="post">
+        <div class="form-group">
+            <label for="number1">Enter First Number:</label>
+            <input type="number" id="number1" name="number1" required>
+        </div>
+        <div class="form-group">
+            <label for="number2">Enter Second Number:</label>
+            <input type="number" id="number2" name="number2" required>
+        </div>
+        <div class="form-group">
+            <button type="submit">Calculate</button>
+        </div>
+        
+    </form>
+    <div class="form-group">
+        <label for="result1">Result:</label>
+        <input type="text" id="result1" name="result1" readonly>
+    </div>
+</div>
+
+<div class="form-container">
+    <h2>Question 2: Categorize Quotes</h2>
+    <form id="form2">
+        <div class="form-group">
+            <label for="quote">Enter Quote:</label>
+            <textarea id="quote" name="quote" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+            <button type="submit">Categorize</button>
+        </div>
+        <div class="form-group">
+            <label for="result2">Result:</label>
+            <input type="text" id="result2" name="result2" readonly>
+        </div>
+    </form>
+</div>
+<div class="form-container">
+    <h2>Question 3: Write a query</h2>
+    <p>SELECT e.eventId, e.eventName,e.eventOccasion,e.insertedDate AS eventInsertedDate,d.startDate,d.endDate,d.insertedDate AS dateInsertedDate FROM eventMaster e JOIN eventDateMapping d ON e.eventId = d.eventId ORDER BY e.eventId, d.startDate</p>
+</div>
+<div class="form-container">
+    <h2>Question 4: Write a query</h2>
+    <p>SELECT rm.restaurantId,rm.restaurantName,COUNT(ra.restaurantAttachmentId) AS attachmentCount,ra.fileName AS latestFileName, ra.attachmentType AS latestAttachmentType, ra.insertedDate AS latestInsertedDate FROM restaurantMaster rm LEFT JOIN (SELECT restaurantId, fileName, attachmentType, insertedDate, restaurantAttachmentId FROM restaurantAttachment WHERE (restaurantId, insertedDate) IN ( SELECT restaurantId, MAX(insertedDate) FROM restaurantAttachment GROUP BY restaurantId ) ) ra ON rm.restaurantId = ra.restaurantId GROUP BY rm.restaurantId, ra.fileName, ra.attachmentType, ra.insertedDate ORDER BY rm.restaurantId;</p>
+</div>
+
+<script>
+const form1 = document.getElementById('form1')
+
+form1.addEventListener('submit',async(e)=>{
+    e.preventDefault()
+    const number1 = document.getElementById('number1').value
+    const number2 = document.getElementById('number2').value
+    const response = await fetch('/addWithoutCarry',{
+        method:'post',
+        body: JSON.stringify({ number1, number2 }),
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    })
+    const result = await response.json()
+   document.getElementById('result1').value = result.data
+
+})
+
+document.getElementById('form2').addEventListener('submit',async(e)=>{
+    e.preventDefault()
+    const quote = document.getElementById('quote').value;
+    const response = await fetch('/IdentifyQuates',{
+        method:'post',
+        body: JSON.stringify({quote}),
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    })
+    const result = await response.json()
+    document.getElementById('result2').value = result.data;
+})
+</script>
+
+</body>
+</html>
